@@ -96,6 +96,25 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   return res.status(404).json({ message: "unable to create a review" });
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  let reqIsbn = req.params.isbn;
+  let username = req.session.authorization["username"];
+
+  let selectedBook = books[reqIsbn];
+  let bookReviews = selectedBook.reviews;
+
+  console.log(username);
+  console.log(bookReviews.length);
+  console.log("bookReviews[username] ==>", bookReviews[username]);
+
+  if (Object.keys(bookReviews).length > 0 && bookReviews[username]) {
+    delete bookReviews[username];
+    res.send(200, `Se ha eliminado el review de ${username}`);
+  } else {
+    res.send(404, `El usuario ${username} no tiene una revisión existente.`);
+  }
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
