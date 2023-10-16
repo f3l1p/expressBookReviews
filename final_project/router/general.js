@@ -1,8 +1,14 @@
-const express = require("express");
+const express = require("express")
 let books = require("./booksdb.js");
+const axios = require("axios");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+
+public_users.get("/books", (req, res) => {
+  const jsonFilePath = "./booksdb.json";
+  res.sendFile(jsonFilePath, { root: __dirname });
+});
 
 public_users.post("/register", (req, res) => {
   let username = req.body.username;
@@ -21,9 +27,17 @@ public_users.post("/register", (req, res) => {
   return res.status(404).json({ message: "Unable to register user." });
 });
 
-// Get the book list available in the shop
-public_users.get("/", function (req, res) {
-  return res.status(200).json(books);
+public_users.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("http://localhost:5000/books");
+    const jsonData = response.data;
+    res.status(200).json(jsonData);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the JSON file." });
+  }
 });
 
 // Get book details based on ISBN
