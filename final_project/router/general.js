@@ -10,6 +10,19 @@ public_users.get("/books", (req, res) => {
   res.sendFile(jsonFilePath, { root: __dirname });
 });
 
+public_users.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("http://localhost:5000/books");
+    const jsonData = response.data;
+    res.status(200).json(jsonData);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the JSON file." });
+  }
+});
+
 public_users.post("/register", (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
@@ -27,18 +40,7 @@ public_users.post("/register", (req, res) => {
   return res.status(404).json({ message: "Unable to register user." });
 });
 
-public_users.get("/", async (req, res) => {
-  try {
-    const response = await axios.get("http://localhost:5000/books");
-    const jsonData = response.data;
-    res.status(200).json(jsonData);
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching the JSON file." });
-  }
-});
+
 
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
